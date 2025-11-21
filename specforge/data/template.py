@@ -186,3 +186,28 @@ TEMPLATE_REGISTRY.register(
         parser_type="openai-harmony",
     ),
 )
+
+TEMPLATE_REGISTRY.register(
+    name="deepseek-v3",
+    template=ChatTemplate(
+        assistant_header="<｜Assistant｜>",
+        user_header="<｜User｜>",
+        system_prompt="", 
+        end_of_turn_token="",
+        bos_token="<｜begin of sentence｜>",
+        eos_token="<｜end of sentence｜>",
+        parser_type="general", 
+    ),
+)
+
+TEMPLATE_REGISTRY.register(
+    name="kimi_k2",
+    template=ChatTemplate(
+        system_header="<|im_system|>system<|im_middle|>",
+        system_prompt="",                      
+        user_header="<|im_user|>user<|im_middle|>",
+        assistant_header="<|im_assistant|>assistant<|im_middle|>",
+        end_of_turn_token="<|im_end|>",
+        generation_prompt=""                    
+    ),
+)

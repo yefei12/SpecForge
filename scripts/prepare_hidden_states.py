@@ -33,7 +33,8 @@ from sglang.srt.utils import (
     set_gpu_proc_affinity,
 )
 from tqdm import tqdm
-from transformers import AutoConfig, AutoTokenizer
+# from transformers import AutoConfig, AutoTokenizer
+from transformers import AutoConfig, AutoTokenizer, PreTrainedTokenizerFast
 
 from specforge.data import build_eagle3_dataset
 from specforge.utils import print_with_rank, rank_0_priority
@@ -85,7 +86,9 @@ class SglangHiddenStatesGenerator:
                 self.server_args.tp_size, self.server_args.nnodes, tp_rank
             )
         configure_logger(self.server_args, prefix=f" TP{tp_rank}")
-        self.model_runner, _ = load_model(self.server_args, self.port_args, tp_rank)
+        # self.model_runner, _ = load_model(self.server_args, self.port_args, tp_rank)
+        local_rank = tp_rank % torch.cuda.device_count()
+        self.model_runner, _ = load_model(self.server_args, self.port_args, local_rank)
         wrap_logits_processors_in_module(self.model_runner.model)
         self.tp_rank = tp_rank
 
@@ -357,7 +360,8 @@ def main():
     dataset = load_dataset("json", data_files=args.data_path)["train"]
     if args.num_samples is not None:
         dataset = dataset.select(range(args.num_samples))
-    tokenizer = AutoTokenizer.from_pretrained(args.model_path)
+    # tokenizer = AutoTokenizer.from_pretrained(args.model_path)
+    tokenizer = PreTrainedTokenizerFast.from_pretrained(args.model_path, trust_remote_code=True, use_fast=True)
     cache_params_string = (
         f"{args.data_path}-"
         f"{args.max_length}-"

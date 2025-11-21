@@ -8,7 +8,7 @@ import os
 
 from accelerate.utils import set_seed
 from datasets import load_dataset
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, PreTrainedTokenizerFast
 
 from specforge import AutoDraftModelConfig
 from specforge.data import build_eagle3_dataset, generate_vocab_mapping_file
@@ -81,7 +81,9 @@ def main():
     set_seed(args.seed)
 
     # build dataloaders
-    tokenizer = AutoTokenizer.from_pretrained(args.target_model_path)
+    # tokenizer = AutoTokenizer.from_pretrained(args.target_model_path)
+    tokenizer = PreTrainedTokenizerFast.from_pretrained(args.target_model_path)
+
     draft_model_config = AutoDraftModelConfig.from_file(args.draft_model_config)
     if args.debug:
         train_ds = load_dataset("json", data_files=args.train_data_path)["train"]

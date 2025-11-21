@@ -29,7 +29,7 @@ from typing import Dict, List, Optional, Tuple, Union
 import torch
 from datasets import Dataset as HFDataset
 from tqdm import tqdm
-from transformers import ImageProcessingMixin, PreTrainedTokenizer
+from transformers import ImageProcessingMixin, PreTrainedTokenizer, PreTrainedTokenizerFast
 
 try:
     from qwen_vl_utils import process_vision_info
@@ -111,7 +111,7 @@ def _apply_loss_mask_from_chat_template(
 
 # Copied from https://github.com/SafeAILab/EAGLE/blob/main/eagle/traineagle3/cnets.py
 def preprocess_conversations(
-    tokenizer: PreTrainedTokenizer,
+    tokenizer: PreTrainedTokenizerFast,
     conversations: Union[List[Conversation], List[str]],
     chat_template: ChatTemplate,
     max_length: int = 2048,
