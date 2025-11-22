@@ -220,9 +220,12 @@ async def main():
                 if output_obj.error is not None:
                     output_dict["error"] = output_obj.error
                     output_dict["input_conversations"] = output_obj.input_conversations
-                    f_error.write(json.dumps(output_dict) + "\n")
+                    # f_error.write(json.dumps(output_dict) + "\n")
+                    f_error.write(json.dumps(output_dict, ensure_ascii=False) + "\n")  
                 else:
-                    f.write(json.dumps(output_dict) + "\n")
+                    # f.write(json.dumps(output_dict) + "\n")
+                    f.write(json.dumps(output_dict, ensure_ascii=False) + "\n")
+
 
 
 if __name__ == "__main__":
