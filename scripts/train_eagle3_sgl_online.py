@@ -27,7 +27,7 @@ from sglang.srt.server_args import ServerArgs
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from torch.distributed.fsdp import MixedPrecision, ShardingStrategy, StateDictType
 from tqdm import tqdm
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, PreTrainedTokenizerFast
 
 from specforge import AutoDraftModelConfig, AutoEagle3DraftModel, OfflineEagle3Model
 from specforge.data import (
@@ -406,7 +406,7 @@ class SglOnlineEagle3Trainer:
         self.eagle3_model = eagle3_model
 
     def create_dataloaders(self):
-        tokenizer = AutoTokenizer.from_pretrained(self.args.target_model_path)
+        tokenizer = PreTrainedTokenizerFast.from_pretrained(self.args.target_model_path)
         cache_params_string = (
             f"{self.args.train_data_path}-"
             f"{self.args.max_length}-"
