@@ -270,6 +270,7 @@ def main():
     )
     cache_key = hashlib.md5(cache_params_string.encode()).hexdigest()
     train_dataset = load_dataset("json", data_files=args.train_data_path)["train"]
+    '''
     with rank_0_priority():
         train_eagle3_dataset_tmp = build_eagle3_dataset(
             dataset=train_dataset,
@@ -292,7 +293,51 @@ def main():
             args.train_hidden_states_path,
             args.max_length,
         )
+    '''
+    rank = dist.get_rank()
+    if rank == 0:
+        train_eagle3_dataset_tmp = build_eagle3_dataset(
+            dataset=train_dataset,
+            tokenizer=tokenizer,
+            chat_template=args.chat_template,
+            is_preformatted=args.is_preformatted,
+            max_length=args.max_length,
+            cache_dir=os.path.join(args.cache_dir, "processed_dataset"),
+            cache_key=cache_key,
+            num_proc=args.build_dataset_num_proc,
+        )
+        vocab_mapping_path = generate_vocab_mapping_file(
+            dataset=train_eagle3_dataset_tmp,
+            target_vocab_size=draft_model_config.vocab_size,
+            draft_vocab_size=draft_model_config.draft_vocab_size,
+            cache_dir=os.path.join(args.cache_dir, "vocab_mapping"),
+            cache_key=cache_key,
+        )
 
+    dist.barrier()
+
+    train_eagle3_dataset_tmp = build_eagle3_dataset(
+        dataset=train_dataset,
+        tokenizer=tokenizer,
+        chat_template=args.chat_template,
+        is_preformatted=args.is_preformatted,
+        max_length=args.max_length,
+        cache_dir=os.path.join(args.cache_dir, "processed_dataset"),
+        cache_key=cache_key,
+        num_proc=args.build_dataset_num_proc,
+    )
+    vocab_mapping_path = generate_vocab_mapping_file(
+        dataset=train_eagle3_dataset_tmp,
+        target_vocab_size=draft_model_config.vocab_size,
+        draft_vocab_size=draft_model_config.draft_vocab_size,
+        cache_dir=os.path.join(args.cache_dir, "vocab_mapping"),
+        cache_key=cache_key,
+    )
+    train_eagle3_dataset = build_offline_eagle3_dataset(
+        args.train_hidden_states_path,
+        args.max_length,
+    )
+    
     train_dataloader = prepare_dp_dataloaders(
         train_eagle3_dataset,
         args.draft_micro_batch_size,
