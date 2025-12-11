@@ -211,3 +211,17 @@ TEMPLATE_REGISTRY.register(
         generation_prompt=""                    
     ),
 )
+
+TEMPLATE_REGISTRY.register(
+    name="ling-flash-2.0",
+    template=ChatTemplate(
+        system_header="<role>SYSTEM</role>",
+        system_prompt="",          
+        user_header="<role>HUMAN</role>",
+        assistant_header="<role>ASSISTANT</role>",
+        end_of_turn_token="<|role_end|>",
+        bos_token=None,
+        eos_token="<|role_end|>",
+        generation_prompt="",
+    ),
+)
